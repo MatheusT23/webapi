@@ -1,6 +1,7 @@
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
+
 const client = new Client({
     webVersionCache: {
       type: "remote",
@@ -17,9 +18,6 @@ client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
 
-client.on('message_create', message => {
-	console.log(message.body);
-});
 client.on('message_create', message => {
 	if (message.body === '!ping') {
 		// send back "pong" to the chat the message was sent in
