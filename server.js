@@ -1,18 +1,26 @@
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-require("dotenv").config();
-const  OpenAI  = require("openai");
+const OpenAI  = require("openai");
 const http = require('http');
 const https = require('https');
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+require("dotenv").config();
 
 
 app.use(express.json()); // Para lidar com solicitações JSON
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+const client = new Client({
+  webVersionCache: {
+    type: "remote",
+    remotePath:
+      "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html",
+  },
 });
 
 app.get("/chat", async (req, res) => {
@@ -37,13 +45,6 @@ app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-const client = new Client({
-  webVersionCache: {
-    type: "remote",
-    remotePath:
-      "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html",
-  },
-});
 
 client.on('ready', () => {
   console.log('Client is ready!');
@@ -53,7 +54,7 @@ client.on('qr', qr => {
   qrcode.generate(qr, {small: true});
 });
 
-client.on('message', message => {
+/*client.on('message', message => {
   if(!message.fromMe){  
     http.get(`http://localhost:3000/chat?query=${message.body}`, (resp) => {
         let data = '';
@@ -71,6 +72,12 @@ client.on('message', message => {
         console.error('Erro na requisição:', err.message);
     });
   }
+});*/
+client.on('message_create', message => {
+	if (message.body === '!ping') {
+		// send back "pong" to the chat the message was sent in
+		client.sendMessage(message.from, 'pong');
+	}
 });
 
 client.initialize();
