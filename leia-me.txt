@@ -1,0 +1,3 @@
+Comando: npm start  para inicia o app
+Acessar http://localhost:3000 para abrir o index.html
+Inserir o número de telefone e clicar em gerar código

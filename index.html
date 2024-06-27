@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Interaction</title>
+    <style>
+        #log-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            height: 200px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+        }
+        .log-entry {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Interaction</h1>
+    <div id="qr-container">
+        <h2>QR Code:</h2>
+        <img id="qr-image" src="" alt="QR Code will appear here">
+    </div>
+    <div id="pairing-container">
+        <h2>Pairing Code:</h2>
+        <p id="pairing-code">Pairing code will appear here</p>
+    </div>
+
+    <div id="input-container">
+        <h2>Enter Phone Number:</h2>
+        <input type="text" id="phone-number" placeholder="Enter phone number">
+        <button id="request-code">Request Pairing Code</button>
+        <button id="disconnect-client">Disconnect Client</button>
+    </div>
+
+    <div id="log-container">
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Receber o QR code do servidor
+        socket.on('qr', (qr) => {
+            console.log('Received QR:', qr);
+
+            const qrImage = document.getElementById('qr-image');
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qr)}`;
+            qrImage.alt = 'QR Code';
+        });
+
+        // Receber o código de pareamento do servidor
+        socket.on('pairingCode', (pairingCode) => {
+            console.log('Received Pairing Code:', pairingCode);
+
+            const pairingCodeElement = document.getElementById('pairing-code');
+            pairingCodeElement.textContent = pairingCode;
+        });
+
+        // Receber logs do servidor
+        socket.on('log', (log) => {
+            const logContainer = document.getElementById('log-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = log;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        });
+
+        // Enviar o número de telefone para o servidor
+        document.getElementById('request-code').addEventListener('click', () => {
+            const phoneNumber = document.getElementById('phone-number').value;
+            socket.emit('requestPairingCode', phoneNumber);
+        });
+         // Enviar o comando de desconexão para o servidor
+        document.getElementById('disconnect-client').addEventListener('click', () => {
+            socket.emit('disconnectClient');
+        });
+    </script>
+</body>
+</html>
