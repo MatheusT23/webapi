@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 const port = 3000;
-const webhookUrl = 'http://127.0.0.1:5000/evolution-webhook';
+const webhookUrl = 'http://127.0.0.1:5050/evolution-webhook';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,7 +42,7 @@ let pairingCodeRequested = false;
 
 client.on('qr', async (qr) => {
     const message = 'QR RECEIVED: ' + qr;
-    console.log(message);
+    // console.log(message);
     io.emit('log', message);
     io.emit('qr', qr);
 });
@@ -100,6 +100,43 @@ client.on('message', async message => {
             io.emit('log', errorMessage);
         });
     }
+    // Verificando se há áudio na mensagem
+    if (message.hasMedia) {
+        const media = await message.downloadMedia();
+        if (media.mimetype.startsWith('audio/')) {
+            const logAudioMessage = 'Audio message received';
+            console.log(logAudioMessage);
+            io.emit('log', logAudioMessage);
+
+            // Convertendo o áudio para base64
+            const audioBase64 = media.data;
+            // Enviando o áudio para o python
+            axios.post(webhookUrl, {
+                audio: audioBase64,
+                mimetype: media.mimetype,
+                remetente: message.from
+            })
+        .then(function (response) {
+            const webhookMessage = 'Audio webhook enviado com sucesso!';
+            console.log(webhookMessage);
+            io.emit('log', webhookMessage);
+        })
+        .catch(function (error) {
+            const errorMessage = 'Erro ao enviar o webhook de áudio: ' + error;
+            console.error(errorMessage);
+            io.emit('log', errorMessage);
+        });
+        }
+    };
+});
+app.post('/send-message', (req, res) => {
+    const { to, message } = req.body;
+
+    client.sendMessage(to, message).then(response => {
+        res.status(200).json({ status: 'success', response: response });
+    }).catch(err => {
+        res.status(500).json({ status: 'error', response: err });
+    });
 });
 
 io.on('connection', (socket) => {

@@ -5,16 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Interaction</title>
     <style>
+
+        *{
+            margin: 10px auto 0px auto;
+            padding: 5px;
+        }
+        div,h1{
+            margin: 0px auto 0px auto;
+            text-align: center;
+
+           
+        }
         #log-container {
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ccc;
-            height: 200px;
+            height: 600px;
+            width: 800px;
+            max-width: 600px;
+            max-height: 800px ;
             overflow-y: scroll;
             background-color: #f9f9f9;
         }
         .log-entry {
             margin: 5px 0;
+        }
+        .log{
+            max-width: 600px;
+            max-height: 800px ;
+            font-size: smaller;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .btn{
+            display: inline-block;
+            align-items: flex-start;
+            padding: 10px;
+            margin: 10px 10px;
         }
     </style>
 </head>
@@ -24,19 +50,21 @@
         <h2>QR Code:</h2>
         <img id="qr-image" src="" alt="QR Code will appear here">
     </div>
+
+    <div id="input-container" >
+        <h3>Conectar usando código de pareamento</h3>
+        <label>Telefone:
+        <input type="text" id="phone-number" placeholder="Digite o número do telefone">
+    </label>
+        <div class="btn">
+            <button id="request-code" class ="btn">Gerar Código</button>
+            <button id="disconnect-client" class="btn">Desconectar</button>
+        </div>
+    </div>
     <div id="pairing-container">
-        <h2>Pairing Code:</h2>
-        <p id="pairing-code">Pairing code will appear here</p>
+        <h3>Código de pareamento:</h3><p id="pairing-code">  Digite o telefone e clique em receber código</p>
     </div>
-
-    <div id="input-container">
-        <h2>Enter Phone Number:</h2>
-        <input type="text" id="phone-number" placeholder="Enter phone number">
-        <button id="request-code">Request Pairing Code</button>
-        <button id="disconnect-client">Disconnect Client</button>
-    </div>
-
-    <div id="log-container">
+    <div id="log-container" class="log">
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
