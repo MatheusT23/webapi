@@ -28,6 +28,7 @@ whatsapp-automation/
 ├── README.md
 └── .gitignore
 
+
 Descrição dos Diretórios e Arquivos
 Backend (Flask)
 
